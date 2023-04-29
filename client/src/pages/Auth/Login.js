@@ -68,7 +68,10 @@ const location = useLocation();
                   required
                 />
             </div>
-            <button type="submit" className="btn btn-primary">REGISTER</button>
+            <div className='mb-3'>
+              <button type="submit" className="btn btn-primary" onClick={()=>{navigate('/forgot-password')}}>Forgot Password</button>
+            </div>
+            <button type="submit" className="btn btn-primary">LOGIN</button>
           </form>
         </div>
     </Layout>

@@ -11,7 +11,8 @@ const Register = () => {
     email: '',
     password: '',
     phone: '',
-    address: ''
+    address: '',
+    answer: ''
   });
 
   const navigate = useNavigate();
@@ -22,23 +23,23 @@ const Register = () => {
        [e.target.name]: e.target.value
     })
   }
-  const {name,email,password,phone,address} = input;
+  const {name,email,password,phone,address,answer} = input;
   const handelSubmit = async(e) =>{
      e.preventDefault();
-     console.log(process.env.REACT_APP_API)
      try {
         const res = await axios.post(`${process.env.REACT_APP_API}/api/v1/auth/register`,{
             name,
             email,
             password,
             phone,
-            address
+            address,
+            answer
         });
 
         if(res && res.data.success){
             toast.success(res.data && res.data.message);
             setTimeout(()=>{
-                navigate('login');
+                navigate('/login');
             }, 4000)
         }else{
             toast.error(res.data.message);
@@ -107,6 +108,17 @@ const Register = () => {
                   value={address}
                   name="address" 
                   placeholder='Enter your Address'
+                  onChange={(e)=>handleChange(e)}
+                  required
+                />
+            </div>
+            <div className="mb-3">
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  value={answer}
+                  name="answer" 
+                  placeholder='What is Your Favorite sports'
                   onChange={(e)=>handleChange(e)}
                   required
                 />
