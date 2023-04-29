@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import Layout from '../../components/Layout/Layout'
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import '../../styles/AuthStyles.css';
 
 const Register = () => {
   const [input, setInput] = useState({
@@ -10,6 +13,8 @@ const Register = () => {
     phone: '',
     address: ''
   });
+
+  const navigate = useNavigate();
   
   const handleChange = (e) => {
     setInput({
@@ -18,32 +23,55 @@ const Register = () => {
     })
   }
   const {name,email,password,phone,address} = input;
-  const handelSubmit = (e) =>{
+  const handelSubmit = async(e) =>{
      e.preventDefault();
-     console.log(name,email,password,phone,address);
-     toast.success('Register Successfully')
+     console.log(process.env.REACT_APP_API)
+     try {
+        const res = await axios.post(`${process.env.REACT_APP_API}/api/v1/auth/register`,{
+            name,
+            email,
+            password,
+            phone,
+            address
+        });
+
+        if(res && res.data.success){
+            toast.success(res.data && res.data.message);
+            setTimeout(()=>{
+                navigate('login');
+            }, 4000)
+        }else{
+            toast.error(res.data.message);
+        }
+     } catch (error) {
+        console.log(error);
+        toast.error(`Something went wrong ${error}`)
+     }
+     
   }
+
   return (
     <Layout title={'Register - Ecommerce APP'}>
-        <div className='register'>
-          <h1>Register Page</h1>
+        <div className='form-container'>
           <form onSubmit={handelSubmit}>
+            <h4 className='title'>REGISTER FORM</h4>
             <div className="mb-3">
                 <input 
                   type="text" 
                   className="form-control" 
-                  value={input.name}
+                  value={name}
                   name="name" 
                   placeholder='Enter your Name'
                   onChange={(e)=>handleChange(e)}
                   required
+                  autoFocus
                 />
             </div>
             <div className="mb-3">
                 <input 
                   type="email" 
                   className="form-control" 
-                  value={input.email}
+                  value={email}
                   name="email" 
                   placeholder='Enter your Email'
                   onChange={(e)=>handleChange(e)}
@@ -56,7 +84,7 @@ const Register = () => {
                   className="form-control" 
                   name="password"
                   placeholder='Enter your Password'
-                  value={input.password}
+                  value={password}
                   onChange={(e)=>handleChange(e)}
                   required
                 />
@@ -65,7 +93,7 @@ const Register = () => {
                 <input 
                   type="text" 
                   className="form-control"
-                  value={input.phone} 
+                  value={phone} 
                   name="phone"
                   placeholder='Enter your Phone'
                   onChange={(e)=>handleChange(e)}
@@ -76,14 +104,14 @@ const Register = () => {
                 <input 
                   type="text" 
                   className="form-control" 
-                  value={input.address}
+                  value={address}
                   name="address" 
                   placeholder='Enter your Address'
                   onChange={(e)=>handleChange(e)}
                   required
                 />
             </div>
-            <button type="submit" className="btn btn-primary">Submit</button>
+            <button type="submit" className="btn btn-primary">REGISTER</button>
           </form>
         </div>
     </Layout>
