@@ -18,8 +18,8 @@ import CreateProducto from './pages/Admin/CreateProducto';
 import Users from './pages/Admin/Users';
 import Profile from './pages/user/Profile';
 import Orders from './pages/user/Orders';
-
-
+import Products from './pages/Admin/Products';
+import ActualizarProducto from './pages/Admin/ActualizarProducto';
 
 
 function App() {
@@ -36,6 +36,8 @@ function App() {
              <Route path='admin' element={<AdminDashboard/>}/>
              <Route path='admin/create-category' element={<CreateCategorias/>}/>
              <Route path='admin/create-product' element={<CreateProducto/>}/>
+             <Route path='admin/product/:slug' element={<ActualizarProducto/>}/>
+             <Route path='admin/products' element={<Products/>}/>
              <Route path='admin/users' element={<Users/>}/>
          </Route>
          <Route path='/login' element={<Login/>}/>

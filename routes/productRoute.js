@@ -10,6 +10,6 @@ router.put('/update-product/:pid', requireSignIn, isAdmin, formidable(), updateP
 router.get('/get-product', getProductController);
 router.get('/get-product/:slug', getSingleProductController);
 router.get('/product-photo/:pid', productPhotoController);
-router.delete('/product/:pid', requireSignIn, isAdmin, deleteProductController);
+router.delete('/delete-product/:pid', requireSignIn, isAdmin, deleteProductController);
 
 export default router;
