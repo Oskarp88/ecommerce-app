@@ -1,30 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../components/Layout/Layout';
-import { useAuth } from '../context/auth';
 import axios from 'axios';
 import { Checkbox, Radio} from 'antd'
 import { Price } from '../components/Prices';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
-  const [auth, setAuth] = useAuth();
   const [categories, setCategories] = useState([]);
   const [checked, setCheked] = useState([]);
   const [radio, setRadio] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   //get Products
   const getAllProducts = async () => {
+    
     try {
-       const {data} = await axios.get(`${process.env.REACT_APP_API}/api/v1/product/get-product`);
+       setLoading(true)
+       const {data} = await axios.get(`${process.env.REACT_APP_API}/api/v1/product/product-list/${page}`);
+       setLoading(false)
        setProducts(data.product);
     } catch (error) {
+       setLoading(false);
        console.log(error);
     }
   }
 
   useEffect(()=>{
-    getAllProducts();
-  },[]);
+    if(!checked.length || !radio.length) getAllProducts();
+  },[checked.length,radio.length]);
+
+  useEffect(()=>{
+    if(checked.length || radio.length) filterProduct();
+  },[checked,radio])
 
   //get all cat
   const getAllCategory = async () => {
@@ -37,7 +48,35 @@ const HomePage = () => {
       console.log(error);
     }
   }
+  
+  //getTotal Count
+  const getTotal = async () => {
+    try {
+      const {data} = await axios.get(`${process.env.REACT_APP_API}/api/v1/product/product-count`);
+      setTotal(data?.total)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
+  useEffect(()=>{
+    if(page===1) return;
+    loadMore();
+  },[page])
+
+  //load more
+  const loadMore = async() => {
+    try {
+      setLoading(true);
+      const {data} = await axios.get(`${process.env.REACT_APP_API}/api/v1/product/product-list/${page}`)
+      setLoading(false);
+      setProducts([...products, ...data?.products])
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  }
+  
   const handleFilter = (value, id) => {
      let all = [...checked];
      if(value){
@@ -50,9 +89,17 @@ const HomePage = () => {
 
   useEffect(()=>{
     getAllCategory();
-    
+    getTotal();
   },[]);
-
+  
+  const filterProduct = async () => {
+    try {
+       const {data} = await axios.post(`${process.env.REACT_APP_API}/api/v1/product/product-filters`,{checked, radio})
+       setProducts(data?.products);
+    } catch (error) {
+       console.log(error)
+    }
+  }
   return (
     <Layout title={'All Products - Best offers'}>
         <div className='row mt-3'>
@@ -80,6 +127,9 @@ const HomePage = () => {
                 }
               </Radio.Group>
             </div>
+            <div className='d-flex flex-column'>
+              <button className='btn btn-danger' onClick={()=> window.location.reload()}>RESET FILTERS</button>
+            </div>
           </div>
           <div className='col-md-9'>
             {JSON.stringify(radio, null, 4)}
@@ -91,13 +141,29 @@ const HomePage = () => {
                             <img src={`${process.env.REACT_APP_API}/api/v1/product/product-photo/${p._id}`} className="card-img-top" alt={p.name}/>
                             <div className="card-body">
                                 <h5 className="card-title">{p.name}</h5>
-                                <p className="card-text">{p.description}</p>
-                                <button  className="btn btn-primary ms-1">See Details</button>
+                                <p className="card-text">{p.description.substring(0,30)}...</p>
+                                <p className="card-text">$ {p.price}</p>
+                                <button  
+                                  className="btn btn-primary ms-1"
+                                  onClick={()=> navigate(`/product/${p.slug}`)}
+                                  >More Details</button>
                                 <button  className="btn btn-secondary ms-1">ADD TO CART</button>
                             </div>
                         </div>                                           
                     </>            
                 ))}
+             </div>
+             <div className='m-2 p-3'>
+               {products && products.length < total && (
+                 <button className='btn btn-warning'
+                   onClick={(e) => {
+                    e.preventDefault();
+                    setPage(page + 1);
+                   }}
+                 >
+                  {loading ? 'Loading' : 'Loadmore'}
+                 </button>
+               )}
              </div>
           </div>
         </div>
