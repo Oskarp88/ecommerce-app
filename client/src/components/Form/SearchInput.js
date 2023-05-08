@@ -20,7 +20,7 @@ const SearchInput = () => {
   return (
     <div>
       <form 
-        className="d-flex" 
+        className="d-flex search-form" 
         role="search"
         onSubmit={handleSubmit}
       >

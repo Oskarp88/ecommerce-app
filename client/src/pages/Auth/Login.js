@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/auth';
+import '../../styles/AuthStyles.css';
 
 const Login = () => {
 
@@ -42,13 +43,14 @@ const location = useLocation();
      }
  }
   return (
-    <Layout>
-        <div className='form-container'>
+    <Layout title={'Register - Ecommerce App'}>
+        <div className='form-container' style={{minHeight: '90vh'}}>
           <form onSubmit={handelSubmit}>
             <h4 className='title'>LOGIN</h4>
             <div className="mb-3">
                 <input 
                   type="email" 
+                  autoFocus
                   className="form-control" 
                   value={email}
                   name="email" 
@@ -69,7 +71,11 @@ const location = useLocation();
                 />
             </div>
             <div className='mb-3'>
-              <button type="submit" className="btn btn-primary" onClick={()=>{navigate('/forgot-password')}}>Forgot Password</button>
+              <button 
+                type="submit" 
+                className="btn forgot-btn" 
+                onClick={()=>{navigate('/forgot-password')}}
+              >Forgot Password</button>
             </div>
             <button type="submit" className="btn btn-primary">LOGIN</button>
           </form>

@@ -1,5 +1,6 @@
 
 import { comparePassword, hashPasword } from '../helpers/authHelper.js';
+import orderModel from '../models/orderModel.js';
 import userModel from '../models/userModel.js'
 import JWT from 'jsonwebtoken';
 
@@ -156,4 +157,85 @@ export const forgotPasswordController = async(req, res) =>{
 //test controller
 export const testController = (req, res) => {
     res.status(200).send('protected Route')
+}
+
+//update profile
+export const updateProfileController = async (req, res) => {
+    try {
+        const {name,email,password,address,phone} = req.body;
+        const user = await userModel.findById(req.user._id);
+        if(!password || password.length < 6 ){
+            return res.json({error: 'Password is required and 6 character long'});
+        }
+        const hashedPassword = password ? await hashPasword(password) : undefined;
+        const updateUser = await userModel.findByIdAndUpdate(req.user._id,{
+           name: name || user.name,
+           password: hashedPassword || user.password,
+           phone: phone || user.phone,
+           address: address || user.address
+        },
+        {new: true});
+        res.status(200).send({
+            success: true,
+            message: 'Profile update Successfuly',
+            updateUser
+        })
+    } catch (error) {
+        console.log(error);
+      res.status(500).send({
+        success: false,
+        message: 'Error while update profile',
+        error
+      })
+    }
+}
+
+//orders
+export const getOrdersController = async (req, res) => {
+    try {
+        const orders = await orderModel.find({buyer:req.user._id})
+        .populate('products','-photo')
+        .populate('buyer','name');
+        res.json(orders);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+          success: false,
+          message: 'Error while Geting Orders',
+          error
+        })
+    }
+}
+
+export const getAllOrdersController = async (req, res) => {
+    try {
+        const orders = await orderModel.find({})
+        .populate('products','-photo')
+        .populate('buyer','name')
+        .sort({createdAt: '-1'});
+        res.json(orders);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+          success: false,
+          message: 'Error while Geting Orders',
+          error
+        })
+    }
+}
+
+export const orderStatusController = async(req, res) => {
+    try {
+        const {orderId} = req.params;
+        const { status } = req.body;
+        const orders = await orderModel.findByIdAndUpdate(orderId,{status},{new:true})
+        res.json(orders);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+          success: false,
+          message: 'Error while Updateing Orders',
+          error
+        })
+    }
 }

@@ -96,3 +96,24 @@
   text-decoration: none;
   color: black !important;
 }
+
+.cat-btn{
+  padding: 40px 0;
+  font-size: 24px;
+  text-transform: uppercase;
+}
+
+.cat-btn:hover{
+  background-color: #434343;
+  color: white;
+}
+
+.dashboard{
+  margin-top: 100px !important;
+}
+
+.dashboard-menu h4 {
+  background-color: #434343 !important;
+  color: white;
+  padding: 20px 0px;
+}
