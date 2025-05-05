@@ -99,7 +99,7 @@ exports.loginController = async (req, res) => {
       });
     }
   };
-  
+
 //forgo password
 export const forgotPasswordController = async(req, res) =>{
    try {
@@ -144,35 +144,55 @@ export const testController = (req, res) => {
 }
 
 //update profile
-export const updateProfileController = async (req, res) => {
-    try {
-        const {name,email,password,address,phone} = req.body;
-        const user = await userModel.findById(req.user._id);
-        if(!password || password.length < 6 ){
-            return res.json({error: 'Password is required and 6 character long'});
-        }
-        const hashedPassword = password ? await hashPasword(password) : undefined;
-        const updateUser = await userModel.findByIdAndUpdate(req.user._id,{
-           name: name || user.name,
-           password: hashedPassword || user.password,
-           phone: phone || user.phone,
-           address: address || user.address
-        },
-        {new: true});
-        res.status(200).send({
-            success: true,
-            message: 'Profile update Successfuly',
-            updateUser
-        })
-    } catch (error) {
-        console.log(error);
-      res.status(500).send({
+exports.updateProfileController = async (req, res) => {
+  try {
+    const { name, password, phone, address } = req.body;
+    const user = await userModel.findById(req.user._id);  // req.user inyectado desde middleware de auth
+
+    if (!user) {
+      return res.status(404).json({
         success: false,
-        message: 'Error while update profile',
-        error
-      })
+        message: 'User not found'
+      });
     }
-}
+
+    // Update fields if provided
+    if (name) user.name = name;
+    if (phone) user.phone = phone;
+    if (address) user.address = address;
+    if (password) {
+      if (password.length < 6) {
+        return res.status(400).json({
+          success: false,
+          message: 'Password must be at least 6 characters'
+        });
+      }
+      user.password = await hashPasword(password);
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      user: {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+        role: user.role
+      }
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating profile',
+      error
+    });
+  }
+};
 
 //orders
 export const getOrdersController = async (req, res) => {

@@ -2,35 +2,37 @@ import JWT from 'jsonwebtoken';
 import userModel from '../models/userModel.js';
 
 //Protected Routes token base
-export const requireSignIn = async(req, res, next) => {
+exports.requireSignIn = async (req, res, next) => {
     try {
-        const decode =   JWT.verify(req.headers.authorization, process.env.SECRETA_JWT);
-        req.user = decode;
-        next();
-        
+      const decode = JWT.verify(req.headers.authorization, process.env.SECRETA_JWT);
+      req.user = decode;
+      next();
     } catch (error) {
-        console.log(error)
+      console.error(error);
+      res.status(401).json({
+        success: false,
+        message: 'Unauthorized — Invalid token'
+      });
     }
-}
+  };
 
 //admin access
-export const isAdmin = async(req, res, next) =>{
+exports.isAdmin = async (req, res, next) => {
     try {
-        const user = await userModel.findById(req.user._id);
-        if(user.role !== 1){
-            return res.status(401).send({
-                success: false,
-                message: 'UnAuthorized Access'
-            });
-        }else{
-            next();
-        }
+      const user = await userModel.findById(req.user._id);
+      if (user.role !== 1) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied — Admins only'
+        });
+      }
+      next();
     } catch (error) {
-        console.log(error);
-        res.status(401).send({
-            success: false,
-            error,
-            message: "Error in admin middelware",
-        })
+      console.error(error);
+      res.status(401).json({
+        success: false,
+        message: 'Error in admin middleware',
+        error
+      });
     }
-}
+  };

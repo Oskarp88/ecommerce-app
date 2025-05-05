@@ -10,7 +10,7 @@ import {
     updateProfileController
 } from '../controllers/authController.js';
 import { isAdmin, requireSignIn } from '../middlewares/authMidlewares.js';
-import { registerValidator } from '../validators/authValidator.js';
+import { loginValidator, registerValidator, updateProfileValidator } from '../validators/authValidator.js';
 import { validateRequest } from '../middlewares/validationResult.js';
 
 const router = express.Router();
@@ -19,7 +19,7 @@ const router = express.Router();
 router.post('/register', registerValidator, validateRequest, registerController );
 
 //login // post
-router.post('/login', loginController);
+router.post('/login', loginValidator, validateRequest, loginController);
 
 //Forgot password 
 router.post('/forgot-password', forgotPasswordController);
@@ -38,7 +38,7 @@ router.get('/admin-auth', requireSignIn, isAdmin, (req, res) => {
 })
 
 //update profile
-router.put('/profile', requireSignIn, updateProfileController);
+router.put('/profile', requireSignIn, updateProfileValidator, validateRequest, updateProfileController);
 
 //orders
 router.get('/orders', requireSignIn, getOrdersController);

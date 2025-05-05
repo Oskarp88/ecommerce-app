@@ -14,3 +14,12 @@ exports.loginValidator = [
   body('password').notEmpty().withMessage('Password is required')
 ];
 
+exports.updateProfileValidator = [
+  body('name').optional().notEmpty().withMessage('Name cannot be empty'),
+  body('password')
+    .optional()
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters if provided'),
+  body('phone').optional().notEmpty().withMessage('Phone cannot be empty'),
+  body('address').optional().notEmpty().withMessage('Address cannot be empty')
+];
