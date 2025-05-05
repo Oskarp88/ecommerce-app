@@ -10,11 +10,13 @@ import {
     updateProfileController
 } from '../controllers/authController.js';
 import { isAdmin, requireSignIn } from '../middlewares/authMidlewares.js';
+import { registerValidator } from '../validators/authValidator.js';
+import { validateRequest } from '../middlewares/validationResult.js';
 
 const router = express.Router();
 
 //Register || method POST
-router.post('/register', registerController );
+router.post('/register', registerValidator, validateRequest, registerController );
 
 //login // post
 router.post('/login', loginController);
