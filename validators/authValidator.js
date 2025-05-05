@@ -10,9 +10,7 @@ exports.registerValidator = [
 ];
 
 exports.loginValidator = [
-  body('email')
-    .isEmail().withMessage('Debes ingresar un email válido'),
-
-  body('password')
-    .notEmpty().withMessage('La contraseña es obligatoria'),
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('password').notEmpty().withMessage('Password is required')
 ];
+
