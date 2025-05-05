@@ -5,6 +5,7 @@ import {
     braintreeTokenController,
     createProductController, 
     deleteProductController, 
+    featuredProductsController, 
     getProductController, 
     getSingleProductController, 
     productCategoryController, 
@@ -38,5 +39,7 @@ router.get('/product-category/:slug', productCategoryController);
 router.get('/braintree/token', braintreeTokenController);
 //payments
 router.post('/braintree/payment', requireSignIn, braintreePaymentController);
+// obtener productos destacados
+router.get('/featured-products', featuredProductsController);
 
 export default router;

@@ -19,7 +19,7 @@ var gateway = new braintree.BraintreeGateway({
 
 //payment gateway api
 // token
-export const braintreeTokenController = async(req, res) => {
+exports.braintreeTokenController = async(req, res) => {
     try {
         gateway.clientToken.generate({}, function(err,response){
             if(err){
@@ -34,7 +34,7 @@ export const braintreeTokenController = async(req, res) => {
 }
 
 //payment 
-export const braintreePaymentController = async(req, res) =>{
+exports.braintreePaymentController = async(req, res) =>{
     try {
         const {cart, nonce} = req.body;
         let total = 0;
@@ -64,7 +64,7 @@ export const braintreePaymentController = async(req, res) =>{
     }
 }
 
-export const createProductController = async(req, res) => {
+exports.createProductController = async(req, res) => {
    try {
        const {name,slug,description,price,category,quantify,shipping} = req.fields;
        const {photo} = req.files;
@@ -104,7 +104,7 @@ export const createProductController = async(req, res) => {
    }
 }
 
-export const updateProductController = async(req, res) => {
+exports.updateProductController = async(req, res) => {
     try {
         const {name,slug,description,price,category,quantify,shipping} = req.fields;
         const {photo} = req.files;
@@ -151,7 +151,7 @@ export const updateProductController = async(req, res) => {
     }
 }
 
-export const getProductController = async(req, res) => {
+exports.getProductController = async(req, res) => {
     try {
         const product = await productModel
            .find({})
@@ -175,7 +175,7 @@ export const getProductController = async(req, res) => {
     }
 }
 
-export const getSingleProductController = async(req,res) => {
+exports.getSingleProductController = async(req,res) => {
     try {
         const product = await productModel
         .findOne({slug:req.params.slug})
@@ -197,7 +197,7 @@ export const getSingleProductController = async(req,res) => {
     }
 }
 
-export const productPhotoController = async(req, res) => {
+exports.productPhotoController = async(req, res) => {
     try {
         const product = await productModel.findById(req.params.pid).select('photo');
         if(product.photo.data){
@@ -214,7 +214,7 @@ export const productPhotoController = async(req, res) => {
     }
 }
 
-export const deleteProductController = async(req,res) => {
+exports.deleteProductController = async(req,res) => {
     const { pid } = req.params;
     try {
         await productModel.findByIdAndDelete(pid).select('-photo');
@@ -232,7 +232,7 @@ export const deleteProductController = async(req,res) => {
     }
 }
 
-export const productFilterController = async (req, res) => {
+exports.productFilterController = async (req, res) => {
    try {
        const {checked, radio} = req.body;
        let args = {} 
@@ -252,7 +252,7 @@ export const productFilterController = async (req, res) => {
    }
 }
 
-export const productCountController = async(req, res) => {
+exports.productCountController = async(req, res) => {
    try {
         const total = await productModel.find({}).estimatedDocumentCount();
         res.status(200).send({
@@ -270,30 +270,36 @@ export const productCountController = async(req, res) => {
 }
 
 //product list base on page
-export const productListController = async(req, res) => {
-   try {
-        const perPage = 6;
-        const page = req.params.page ? req.params.page : 1;
-        const products = await productModel.find({})
-           .select('-photo')
-           .skip((page-1) * perPage)
-           .limit(perPage)
-           .sort({createdAt: -1});
-           res.status(200).send({
-            success: true,
-            products
-           })
-   } catch (error) {
-        console.log(error);
-        res.status(400).send({
-            success:false,
-            message: 'Error in per page ctrl',
-            error
-        });
-   }
-}
+exports.productListController = async (req, res) => {
+    try {
+      const perPage = 6;
+      const page = req.query.page ? parseInt(req.query.page) : 1;
+  
+      const products = await productModel.find({})
+        .select('-photo')
+        .skip((page - 1) * perPage)
+        .limit(perPage)
+        .sort({ createdAt: -1 });
+  
+      const totalProducts = await productModel.countDocuments();
+  
+      res.status(200).send({
+        success: true,
+        products,
+        totalProducts
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(400).send({
+        success: false,
+        message: 'Error in infinite scroll',
+        error
+      });
+    }
+  }
+  
 
-export const searchProductController = async(req, res) => {
+exports.searchProductController = async(req, res) => {
    try {
     const {keyword} = req.params;
     const result = await productModel.find({
@@ -313,7 +319,7 @@ export const searchProductController = async(req, res) => {
    }
 }
 
-export const relatedProductController = async(req,res) => {
+exports.relatedProductController = async(req,res) => {
     try {
         const {pid, cid} = req.params;
         const products = await productModel.find({
@@ -335,7 +341,7 @@ export const relatedProductController = async(req,res) => {
 }
 
 //get product by category
-export const productCategoryController = async(req, res) => {
+exports.productCategoryController = async(req, res) => {
     try {
         const category = await categoryModel.findOne({slug: req.params.slug})
         const products = await productModel.find({category}).populate('category');
@@ -353,3 +359,33 @@ export const productCategoryController = async(req, res) => {
         });
     }
 }
+
+exports.featuredProductsController = async (req, res) => {
+    try {
+      const perPage = 6;
+      const page = req.query.page ? parseInt(req.query.page) : 1;
+  
+      const products = await productModel.find({ featured: true })
+        .select('-photo')
+        .skip((page - 1) * perPage)
+        .limit(perPage)
+        .sort({ createdAt: -1 });
+  
+      const totalProducts = await productModel.countDocuments({ featured: true });
+  
+      res.status(200).send({
+        success: true,
+        products,
+        totalProducts
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(400).send({
+        success: false,
+        message: 'Error while getting featured products',
+        error
+      });
+    }
+  };
+  
+  
