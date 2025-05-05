@@ -23,3 +23,13 @@ exports.updateProfileValidator = [
   body('phone').optional().notEmpty().withMessage('Phone cannot be empty'),
   body('address').optional().notEmpty().withMessage('Address cannot be empty')
 ];
+
+// para recuperar contraseña
+exports.forgotPasswordValidator = [
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('answer').notEmpty().withMessage('Answer is required'),
+  body('newPassword')
+    .isLength({ min: 6 })
+    .withMessage('New password must be at least 6 characters')
+];
+

@@ -101,42 +101,36 @@ exports.loginController = async (req, res) => {
   };
 
 //forgo password
-export const forgotPasswordController = async(req, res) =>{
-   try {
-        const {email, answer, newPassword} = req.body;
-        if(!email){
-            res.status(400).send({message: 'Email is required'});
-        }
-        if(!answer){
-            res.status(400).send({message: 'Question is required'});
-        }
-        if(!newPassword){
-            res.status(400).send({message: 'newPassword is required'});
-        }
-        //check 
-        const user = await userModel.findOne({email, answer});
-        //validation
-        if(!user){
-            return res.status(404).send({
-                success: false,
-                message: 'Wrong Email Or Answer'
-            })
-        }
-        const hashed = await hashPasword(newPassword)
-        await userModel.findByIdAndUpdate(user._id,{password: hashed});
-        res.status(200).send({
-            success: true,
-            message: 'Password Reset Successfully'
-        })
-   } catch (error) {
-      console.log(error);
-      res.status(500).send({
+exports.forgotPasswordController = async (req, res) => {
+    try {
+      const { email, answer, newPassword } = req.body;
+      const user = await userModel.findOne({ email, answer });
+  
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'Wrong email or answer'
+        });
+      }
+  
+      const hashed = await hashPasword(newPassword);
+      user.password = hashed;
+      await user.save();
+  
+      res.status(200).json({
+        success: true,
+        message: 'Password reset successfully'
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
         success: false,
-        message: 'Something went wrong',
+        message: 'Error in password recovery',
         error
-      })
-   }
-}
+      });
+    }
+  };
+  
 
 //test controller
 export const testController = (req, res) => {
@@ -156,7 +150,6 @@ exports.updateProfileController = async (req, res) => {
       });
     }
 
-    // Update fields if provided
     if (name) user.name = name;
     if (phone) user.phone = phone;
     if (address) user.address = address;
