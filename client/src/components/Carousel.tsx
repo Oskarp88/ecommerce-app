@@ -1,7 +1,7 @@
-// src/components/Carousel.tsx
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Carousel } from 'react-bootstrap';
 
-const Carousel: React.FC = () => {
+const CarouselComponent: React.FC = () => {
   const images = [
     'https://images.samsung.com/is/image/samsung/assets/es/offer/2025-04-appdays/PCD-Header-PC-SHOP-APP-10.jpg?imwidth=1366',
     'https://www.shutterstock.com/image-illustration/running-sport-shoes-banner-horizontal-260nw-1063090937.jpg',
@@ -10,21 +10,20 @@ const Carousel: React.FC = () => {
     'https://www.shutterstock.com/image-photo/group-successful-confident-business-people-600nw-2044374842.jpg',
   ];
 
-  const [currentImage, setCurrentImage] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImage((prevIndex) => (prevIndex + 1) % images.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <div>
-      <img src={images[currentImage]} alt="Carrusel" style={{ width: '100%', height: '20rem' }} />
-    </div>
+    <Carousel fade interval={5000}>
+      {images.map((img, index) => (
+        <Carousel.Item key={index}>
+          <img
+            className="d-block w-100"
+            src={img}
+            alt={`Slide ${index + 1}`}
+            style={{ height: '20rem', objectFit: 'cover' }}
+          />
+        </Carousel.Item>
+      ))}
+    </Carousel>
   );
 };
 
-export default Carousel;
+export default CarouselComponent;
