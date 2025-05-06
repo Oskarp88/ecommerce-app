@@ -1,17 +1,20 @@
+// src/components/Footer.tsx
 import React from 'react';
 
 const Footer: React.FC = () => {
   return (
     <footer
       style={{
-        backgroundColor: '#333',
-        color: 'white',
-        padding: '20px 0',
+        position: 'fixed',
+        bottom: 0,
+        width: '100%',
+        backgroundColor: '#FFA500',
+        padding: '10px',
         textAlign: 'center',
-        marginTop: 'auto', // Esto asegura que el footer se quede al fondo
+        color: '#fff',
       }}
     >
-      <p>© 2025 E-Commerce. All rights reserved.</p>
+      <p>&copy; 2025 Ecommerce. Todos los derechos reservados.</p>
     </footer>
   );
 };
